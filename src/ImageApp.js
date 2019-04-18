@@ -6,11 +6,13 @@ import {
     TouchableOpacity,
     Platform,
     ScrollView,
+    Dimensions,
     Image
 } from "react-native";
 import { SearchBar } from 'react-native-elements';
 import Icon from "react-native-vector-icons/Ionicons";
 import { connect } from 'react-redux'
+const win = Dimensions.get('window');
 class ImageApp extends Component {
     state = {
         search: '',
@@ -218,7 +220,7 @@ const styles = StyleSheet.create({
     },
     imageStyle:{
         flex:1,
-        width: 130,
+        width: win.width/3,
         height: 130,
     },
     imageContain:{
