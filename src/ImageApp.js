@@ -123,14 +123,26 @@ class ImageApp extends Component {
         console.log(this.state.dataSource)
         for(e in this.state.dataSource){
             console.log(this.state.dataSource[e].previewURL)
+            if(this.state.mode == "gridview"){
             view.push(
                 <View>
                     <Image
-                        style = {[this.state.mode === "gridview" ? styles.imageStyle : styles.imageStyle2]}
+                        style = {[styles.imageStyleGrid]}
                     source={{uri: this.state.dataSource[e].previewURL}}
                     />
                 </View>
-            )
+            )}
+            if(this.state.mode == "listview"){
+                view.push(
+                    <View>
+                        <Image
+                            style = {[styles.imageStyleList]}
+                            source={{uri: this.state.dataSource[e].previewURL}}
+                        />
+                        <Text style={[styles.textHeadlineList]}>Headline</Text>
+                        <Text style={[styles.textMinorList]}>Likes: {this.state.dataSource[e].likes}  Views: {this.state.dataSource[e].views}</Text>
+                    </View>
+                )}
         };
         return view;
     }
@@ -143,7 +155,7 @@ class ImageApp extends Component {
             showsVerticalScrollIndicator={false}
         >
           {this.Header()}
-          <View style = {[styles.imageContain]}>
+          <View style = {[styles.imageContainGrid]}>
           {this.getImages()}
           </View>
 
@@ -157,7 +169,7 @@ class ImageApp extends Component {
                     showsVerticalScrollIndicator={false}
                 >
                     {this.Header()}
-                    <View style = {[styles.imageContain]}>
+                    <View style = {[styles.imageContainList]}>
                         {this.getImages()}
                     </View>
 
@@ -236,22 +248,43 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color:'#000000'
     },
-    imageStyle:{
+    imageStyleGrid:{
         flex:1,
         width: win.width/3,
         height: 130,
     },
-    imageStyle2:{
-        flex:1,
-        width: win.width,
-        height: 130,
+    imageStyleList:{
+        position: 'relative',
+        left: 10,
+        width: 50,
+        height: 50,
+        resizeMode: 'contain',
+        marginBottom: '7%'
     },
-    imageContain:{
+    imageContainGrid:{
         flex: 1,
         width:'100%',
         flexWrap: 'wrap',
         flexDirection: 'row',
         justifyContent: 'center',
+    },
+    imageContainList:{
+        flex: 1,
+        width:'100%',
+        flexDirection: 'column',
+
+    },
+    textHeadlineList: {
+        position: 'absolute',
+        left: '20%',
+        fontSize: 20,
+        color: 'black'
+    },
+    textMinorList:{
+        position:'absolute',
+        left:'20%',
+        top:'30%',
+        color:'gray'
     }
 
 });
