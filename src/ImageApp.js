@@ -126,7 +126,7 @@ class ImageApp extends Component {
             view.push(
                 <View>
                     <Image
-                        style = {[styles.imageStyle]}
+                        style = {[this.state.mode === "gridview" ? styles.imageStyle : styles.imageStyle2]}
                     source={{uri: this.state.dataSource[e].previewURL}}
                     />
                 </View>
@@ -158,7 +158,7 @@ class ImageApp extends Component {
                 >
                     {this.Header()}
                     <View style = {[styles.imageContain]}>
-                    <Text>Hello</Text>
+                        {this.getImages()}
                     </View>
 
                 </ScrollView>
@@ -239,6 +239,11 @@ const styles = StyleSheet.create({
     imageStyle:{
         flex:1,
         width: win.width/3,
+        height: 130,
+    },
+    imageStyle2:{
+        flex:1,
+        width: win.width,
         height: 130,
     },
     imageContain:{
