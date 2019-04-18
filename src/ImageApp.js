@@ -123,7 +123,7 @@ class ImageApp extends Component {
             view.push(
                 <View>
                     <Image
-                    style={{width: 111, height: 111}}
+                        style = {[styles.imageStyle]}
                     source={{uri: this.state.dataSource[e].previewURL}}
                     />
                 </View>
@@ -139,7 +139,10 @@ class ImageApp extends Component {
             showsVerticalScrollIndicator={false}
         >
           {this.Header()}
+          <View style = {[styles.imageContain]}>
           {this.getImages()}
+          </View>
+
         </ScrollView>
         );
     }
@@ -212,5 +215,18 @@ const styles = StyleSheet.create({
     textViewButtonOff:{
         fontSize: 20,
         color:'#000000'
+    },
+    imageStyle:{
+        flex:1,
+        width: 130,
+        height: 130,
+    },
+    imageContain:{
+        flex: 1,
+        width:'100%',
+        flexWrap: 'wrap',
+        flexDirection: 'row',
+        justifyContent: 'center',
     }
+
 });
