@@ -12,6 +12,7 @@ import {
 import { SearchBar } from 'react-native-elements';
 import Icon from "react-native-vector-icons/Ionicons";
 import { connect } from 'react-redux'
+import { throwStatement } from "@babel/types";
 const win = Dimensions.get('window');
 class ImageApp extends Component {
     state = {
@@ -60,11 +61,10 @@ class ImageApp extends Component {
                     value={this.state.search}
                     lightTheme= {true}
                 />
-
                 </View>
+                {this.Buttons()}
             </View>
         )
-        headerScreen.push(this.Buttons())
         return(headerScreen)
       }
 
@@ -231,6 +231,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderWidth: 1.5,
         borderColor: '#0066ff',
+        backgroundColor:'#ffffff'
     },
     viewButtonOn:{
         width:'50%',
