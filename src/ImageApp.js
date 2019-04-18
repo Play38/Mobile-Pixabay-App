@@ -4,7 +4,9 @@ import {
     Text,
     StyleSheet,
     TouchableOpacity,
-    Platform
+    Platform,
+    ScrollView,
+    Image
 } from "react-native";
 import { SearchBar } from 'react-native-elements';
 import Icon from "react-native-vector-icons/Ionicons";
@@ -12,11 +14,27 @@ import { connect } from 'react-redux'
 class ImageApp extends Component {
     state = {
         search: '',
-        mode: 'gridview'
+        mode: 'gridview',
       };
       updateSearch = search => {
         this.setState({ search });
-      };    
+      };
+      
+      componentDidMount(){
+        var API_KEY = '12215533-b9ee53829290d3d207532d1f9';
+        var URL = "https://pixabay.com/api/?key="+API_KEY+"&q="+encodeURIComponent('red roses');
+        return fetch(URL)
+          .then((response) => response.json())
+          .then((responseJson) => {
+            console.log(responseJson)
+            this.setState({
+              dataSource: responseJson.hits
+            });
+          })
+          .catch((error) =>{
+            console.error(error);
+          });
+    }
     Header(){
         var headerScreen=[]
         headerScreen.push(
@@ -97,10 +115,32 @@ class ImageApp extends Component {
             )
     }
     }
+    getImages(){
+        var view= [];
+        console.log(this.state.dataSource)
+        for(e in this.state.dataSource){
+            console.log(this.state.dataSource[e].previewURL)
+            view.push(
+                <View>
+                    <Image
+                    style={{width: 111, height: 111}}
+                    source={{uri: this.state.dataSource[e].previewURL}}
+                    />
+                </View>
+            )
+        };
+        return view;
+    }
 
     render() {
         return (
-            this.Header()
+        <ScrollView
+            stickyHeaderIndices={[0]}
+            showsVerticalScrollIndicator={false}
+        >
+          {this.Header()}
+          {this.getImages()}
+        </ScrollView>
         );
     }
 }
