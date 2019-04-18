@@ -21,7 +21,7 @@ class ImageApp extends Component {
       updateSearch = search => {
         this.setState({ search });
       };
-
+      
       componentDidMount(){
         var API_KEY = '12215533-b9ee53829290d3d207532d1f9';
         var URL = "https://pixabay.com/api/?key="+API_KEY+"&q="+encodeURIComponent('red roses');
@@ -60,7 +60,6 @@ class ImageApp extends Component {
                     value={this.state.search}
                     lightTheme= {true}
                 />
-
                 </View>
             </View>
         )
@@ -136,7 +135,6 @@ class ImageApp extends Component {
     }
 
     render() {
-        if(this.state.mode == "gridview"){
         return (
         <ScrollView
             stickyHeaderIndices={[0]}
@@ -150,22 +148,6 @@ class ImageApp extends Component {
         </ScrollView>
         );
     }
-        if(this.state.mode == "listview"){
-            return (
-                <ScrollView
-                    stickyHeaderIndices={[0]}
-                    showsVerticalScrollIndicator={false}
-                >
-                    {this.Header()}
-                    <View style = {[styles.imageContain]}>
-                    <Text>Hello</Text>
-                    </View>
-
-                </ScrollView>
-            );
-        }
-
-      }
 }
 
 function mapStateToProps(state) {
