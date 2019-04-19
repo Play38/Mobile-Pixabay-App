@@ -12,20 +12,39 @@ import {
 import { SearchBar } from 'react-native-elements';
 import Icon from "react-native-vector-icons/Ionicons";
 import { connect } from 'react-redux'
-import { throwStatement } from "@babel/types";
 const win = Dimensions.get('window');
 class ImageApp extends Component {
     state = {
-        search: '',
+        search: 'dog',
         mode: 'gridview',
       };
       updateSearch = search => {
         this.setState({ search });
-      };
+        var API_KEY = '12215533-b9ee53829290d3d207532d1f9';
+        var URL = "https://pixabay.com/api/?key="+API_KEY+"&q="+encodeURIComponent(this.state.search);
+        return fetch(URL)
+          .then((response) => {
+              console.log(response.status)
+              if(response.status == 200){
+                  response.json().then((responseJson) => {
+                    console.log(responseJson)
+                    if(typeof responseJson != "undefined"){
+                        this.setState({
+                        dataSource: responseJson.hits
+                        });
+                    }
+                  })
+                }
+            })
+
+          .catch((error) =>{
+            console.error(error);
+          });
+    }
 
       componentDidMount(){
         var API_KEY = '12215533-b9ee53829290d3d207532d1f9';
-        var URL = "https://pixabay.com/api/?key="+API_KEY+"&q="+encodeURIComponent('red roses');
+        var URL = "https://pixabay.com/api/?key="+API_KEY+"&q="+encodeURIComponent(this.state.search);
         return fetch(URL)
           .then((response) => response.json())
           .then((responseJson) => {
@@ -40,6 +59,7 @@ class ImageApp extends Component {
     }
     Header(){
         var headerScreen=[]
+        const { search } = this.state;
         headerScreen.push(
             <View >
                 <View style={[styles.header]}>
@@ -58,7 +78,7 @@ class ImageApp extends Component {
                 <SearchBar
                     placeholder="Type Here..."
                     onChangeText={this.updateSearch}
-                    value={this.state.search}
+                    value={search}
                     lightTheme= {true}
                 />
                 </View>
@@ -120,9 +140,7 @@ class ImageApp extends Component {
     }
     getImages(){
         var view= [];
-        console.log(this.state.dataSource)
         for(e in this.state.dataSource){
-            console.log(this.state.dataSource[e].previewURL)
             if(this.state.mode == "gridview"){
             view.push(
                 <View>
@@ -182,7 +200,7 @@ class ImageApp extends Component {
 
 function mapStateToProps(state) {
     return {
-        mode: state.mode
+        mode: this.state.mode
     }
 }
 
