@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import TouchableOpacity from 'react';
+import{TouchableOpacity,Image,Text} from 'react-native';
 
 export default class ImageBtn extends Component {
     constructor(props){
@@ -9,14 +9,15 @@ export default class ImageBtn extends Component {
           style: this.props.style,
           source: this.props.source
         };
+        console.log(this.props.style)
       
     }
    render(){
      return(
-       <TouchableOpacity  onPress={()=>console.log(this.state.id)} >
+       <TouchableOpacity  onPress={()=>console.log(this.props.id)} >
         <Image
-            style={this.state.style}
-            source={{uri: this.state.source}}
+            style={this.props.style}
+            source={{uri: this.props.source}}
         />
        </TouchableOpacity>
      );
