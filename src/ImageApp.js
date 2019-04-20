@@ -24,10 +24,8 @@ class ImageApp extends Component {
         var URL = "https://pixabay.com/api/?key="+API_KEY+"&q="+encodeURIComponent(this.state.search);
         return fetch(URL)
           .then((response) => {
-              console.log(response.status)
               if(response.status == 200){
                   response.json().then((responseJson) => {
-                    console.log(responseJson)
                     if(typeof responseJson != "undefined"){
                         this.setState({
                         dataSource: responseJson.hits,
@@ -49,7 +47,7 @@ class ImageApp extends Component {
         return fetch(URL)
           .then((response) => response.json())
           .then((responseJson) => {
-            console.log(responseJson)
+            console.log(responseJson.hits)
             this.setState({
               dataSource: responseJson.hits
             });
@@ -139,6 +137,9 @@ class ImageApp extends Component {
             )
     }
     }
+    perviewImage(url){
+        console.log(url)
+    }
     getImages(){
         var view= [];
         if(this.state.hitnum === 0)
@@ -154,20 +155,28 @@ class ImageApp extends Component {
                 if (this.state.mode == "gridview") {
                     view.push(
                         <View>
+                            <TouchableOpacity
+                            onPress = {()=>this.perviewImage(this.state.dataSource[e].largeImageURL)}
+                            >
                             <Image
                                 style={[styles.imageStyleGrid]}
                                 source={{uri: this.state.dataSource[e].previewURL}}
                             />
+                            </TouchableOpacity>
                         </View>
                     )
                 }
                 if (this.state.mode == "listview") {
                     view.push(
                         <View>
+                            <TouchableOpacity
+                            onPress = {() => {this.perviewImage(this.state.dataSource[e].largeImageURL)}}
+                            >
                             <Image
                                 style={[styles.imageStyleList]}
                                 source={{uri: this.state.dataSource[e].previewURL}}
                             />
+                            </TouchableOpacity>
                             <Text style={[styles.textHeadlineList]}>Headline</Text>
                             <Text
                                 style={[styles.textMinorList]}>Likes: {this.state.dataSource[e].likes} Views: {this.state.dataSource[e].views}</Text>
