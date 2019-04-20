@@ -30,7 +30,8 @@ class ImageApp extends Component {
                     console.log(responseJson)
                     if(typeof responseJson != "undefined"){
                         this.setState({
-                        dataSource: responseJson.hits
+                        dataSource: responseJson.hits,
+                            hitnum: responseJson.total
                         });
                     }
                   })
@@ -140,28 +141,42 @@ class ImageApp extends Component {
     }
     getImages(){
         var view= [];
-        for(e in this.state.dataSource){
-            if(this.state.mode == "gridview"){
+        if(this.state.hitnum === 0)
+        {
             view.push(
-                <View>
-                    <Image
-                        style = {[styles.imageStyleGrid]}
-                    source={{uri: this.state.dataSource[e].previewURL}}
-                    />
+                <View style = {[styles.noResultView]}>
+                    <Text style = {[styles.noResultText]}>No{'\n'} Results{'\n'} were{'\n'} found</Text>
                 </View>
-            )}
-            if(this.state.mode == "listview"){
-                view.push(
-                    <View>
-                        <Image
-                            style = {[styles.imageStyleList]}
-                            source={{uri: this.state.dataSource[e].previewURL}}
-                        />
-                        <Text style={[styles.textHeadlineList]}>Headline</Text>
-                        <Text style={[styles.textMinorList]}>Likes: {this.state.dataSource[e].likes}  Views: {this.state.dataSource[e].views}</Text>
-                    </View>
-                )}
-        };
+            )
+        }
+        else {
+            for (e in this.state.dataSource) {
+                if (this.state.mode == "gridview") {
+                    view.push(
+                        <View>
+                            <Image
+                                style={[styles.imageStyleGrid]}
+                                source={{uri: this.state.dataSource[e].previewURL}}
+                            />
+                        </View>
+                    )
+                }
+                if (this.state.mode == "listview") {
+                    view.push(
+                        <View>
+                            <Image
+                                style={[styles.imageStyleList]}
+                                source={{uri: this.state.dataSource[e].previewURL}}
+                            />
+                            <Text style={[styles.textHeadlineList]}>Headline</Text>
+                            <Text
+                                style={[styles.textMinorList]}>Likes: {this.state.dataSource[e].likes} Views: {this.state.dataSource[e].views}</Text>
+                        </View>
+                    )
+                }
+            }
+            ;
+        }
         return view;
     }
 
@@ -221,8 +236,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     header :{
-        backgroundColor: '#ff746d', 
-        height: 75  
+        backgroundColor: '#ff746d',
+        height: 75
     },
     textHeader: {
         color: "black",
@@ -304,6 +319,17 @@ const styles = StyleSheet.create({
         left:'20%',
         top:'30%',
         color:'gray'
+    },
+    noResultView:{
+        height:300
+    },
+    noResultText:{
+        color:'black',
+        position:'relative',
+        fontSize: 25,
+        textAlign: 'center',
+        top:'50%'
+
     }
 
 });
