@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import {ImageBtn} from './ImageBtn'
 import {
     View,
     Text,
@@ -155,14 +156,19 @@ class ImageApp extends Component {
                 if (this.state.mode == "gridview") {
                     view.push(
                         <View>
-                            <TouchableOpacity
+                            <ImageBtn
+                            id = {this.state.dataSource[e].largeImageURL}
+                            source = {this.state.dataSource[e].previewURL}
+                            >
+                            </ImageBtn>
+                            {/* <TouchableOpacity
                             onPress = {()=>this.perviewImage(this.state.dataSource[e].largeImageURL)}
                             >
                             <Image
                                 style={[styles.imageStyleGrid]}
                                 source={{uri: this.state.dataSource[e].previewURL}}
                             />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         </View>
                     )
                 }
