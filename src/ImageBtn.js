@@ -7,14 +7,13 @@ export default class ImageBtn extends Component {
       this.state={
           id:this.props.id,
           style: this.props.style,
-          source: this.props.source
-        };
-        console.log(this.props.style)
-      
+          source: this.props.source,
+        };      
     }
    render(){
      return(
-       <TouchableOpacity  onPress={()=>console.log(this.props.id)} >
+       <TouchableOpacity  onPress={() => {this.props.onPress(this.props.id)
+       }} >
         <Image
             style={this.props.style}
             source={{uri: this.props.source}}

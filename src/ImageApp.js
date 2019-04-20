@@ -8,21 +8,25 @@ import {
     Platform,
     ScrollView,
     Dimensions,
-    Image
 } from "react-native";
 import { SearchBar } from 'react-native-elements';
 import Icon from "react-native-vector-icons/Ionicons";
 import { connect } from 'react-redux'
 const win = Dimensions.get('window');
 class ImageApp extends Component {
+    constructor(props) {
+        super(props);
+    
+        this.viewImage = this.viewImage.bind(this);
+      }
     state = {
         search: 'dog',
         mode: 'gridview',
       };
       updateSearch = search => {
-        this.setState({ search });
+        this.setState({ search: search });
         var API_KEY = '12215533-b9ee53829290d3d207532d1f9';
-        var URL = "https://pixabay.com/api/?key="+API_KEY+"&q="+encodeURIComponent(this.state.search);
+        var URL = "https://pixabay.com/api/?key="+API_KEY+"&q="+encodeURIComponent(search);
         return fetch(URL)
           .then((response) => {
               if(response.status == 200){
@@ -82,10 +86,17 @@ class ImageApp extends Component {
                     lightTheme= {true}
                 />
                 </View>
-                {this.Buttons()}
             </View>
         )
-        return(headerScreen)
+        if(this.state.mode == 'listview' || this.state.mode == 'gridview' ){
+            headerScreen.push(
+                <View>
+                    {this.Buttons()}
+                </View>
+            )
+        }
+        return(
+            <View>{headerScreen}</View>)
       }
 
     Buttons(){
@@ -138,16 +149,20 @@ class ImageApp extends Component {
             )
     }
     }
-    perviewImage(url){
-        console.log(url)
-    }
+    viewImage (image){
+        console.log(`${image}`);
+    //     this.setState({
+    //         mode : "singleview",
+    //         img: image
+    //   })
+      }
     getImages(){
         var view= [];
         if(this.state.hitnum === 0)
         {
             view.push(
                 <View style = {[styles.noResultView]}>
-                    <Text style = {[styles.noResultText]}>No{'\n'} Results{'\n'} were{'\n'} found</Text>
+                    <Text style = {[styles.noResultText]}>No Results{'\n'} Were Found :(</Text>
                 </View>
             )
         }
@@ -160,6 +175,7 @@ class ImageApp extends Component {
                             id = {this.state.dataSource[e].largeImageURL}
                             source = {this.state.dataSource[e].previewURL}
                             style={[styles.imageStyleGrid]}
+                            onPress= {this.viewImage}
                             />
                         </View>
                     )
@@ -213,6 +229,15 @@ class ImageApp extends Component {
                 </ScrollView>
             );
         }
+        if(this.state.mode == "singleview"){
+            <ScrollView
+                    stickyHeaderIndices={[0]}
+                    showsVerticalScrollIndicator={false}
+            >
+            {this.Header()}
+            </ScrollView>
+        }
+
 
       }
 }
