@@ -65,23 +65,47 @@ class ImageApp extends Component {
     Header(){
         var headerScreen=[]
         const { search } = this.state;
-        headerScreen.push(
-            <View >
-                <View style={[styles.header]}>
-                <Text style={[styles.textHeader]}>
-                    Image Browser
-                </Text>
-                <TouchableOpacity style = {[styles.heartIcon]}>
-                <Icon
-                    name={Platform.OS === "ios" ? "ios-heart-empty" : "md-heart-empty"}
-                    color="#ccc"
-                    size={40}
-                    />
-                </TouchableOpacity>
+        if(this.state.mode == 'singleview')
+        {
+            headerScreen.push(
+                <View >
+                    <View style={[styles.header]}>
+                        <Text style={[styles.textHeader]}>
+                            Image Browser
+                        </Text>
+                        <TouchableOpacity style = {[styles.returnIcon]}>
+                            <Icon
+                                name={Platform.OS === "ios" ? "ios-return-left" : "md-return-left"}
+                                color="#ccc"
+                                size={40}
+                                onPress = {()=>{
+                                    this.setState({
+                                        mode : "gridview"
+                                    })
+                                }}
+                            />
+                        </TouchableOpacity>
+                    </View>
                 </View>
-            </View>
-        )
+            )
+        }
         if(this.state.mode == 'listview' || this.state.mode == 'gridview' ){
+            headerScreen.push(
+                <View >
+                    <View style={[styles.header]}>
+                        <Text style={[styles.textHeader]}>
+                            Image Browser
+                        </Text>
+                        <TouchableOpacity style = {[styles.heartIcon]}>
+                            <Icon
+                                name={Platform.OS === "ios" ? "ios-heart-empty" : "md-heart-empty"}
+                                color="#ccc"
+                                size={40}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            )
             headerScreen.push(
                 <View>
                 <View style = {[styles.searchStyle]}>
@@ -152,6 +176,7 @@ class ImageApp extends Component {
     }
     viewImage (image){
         this.state.img = image
+        
         this.setState({
             mode : "singleview",
       })
@@ -299,6 +324,11 @@ const styles = StyleSheet.create({
     },
     heartIcon:{
         left: "80%",
+        top: "20%",
+        position: 'absolute'
+    },
+    returnIcon:{
+        left: "10%",
         top: "20%",
         position: 'absolute'
     },
