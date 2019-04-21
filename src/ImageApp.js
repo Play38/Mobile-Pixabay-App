@@ -20,6 +20,7 @@ class ImageApp extends Component {
         super(props);
         
         this.viewImage = this.viewImage.bind(this);
+        this.getSingleImage = this.getSingleImage.bind(this);
       }
     state = {
         search: 'dog',
@@ -54,7 +55,6 @@ class ImageApp extends Component {
         return fetch(URL)
           .then((response) => response.json())
           .then((responseJson) => {
-            console.log(responseJson.hits)
             this.setState({
               dataSource: responseJson.hits
             });
@@ -181,7 +181,6 @@ class ImageApp extends Component {
         this.setState({
             mode : "singleview",
       })
-      console.log(this.state.img)
       }
     getImages(){
         var view= [];
@@ -228,6 +227,42 @@ class ImageApp extends Component {
         return view;
     }
 
+
+    getSingleImage(image){
+        let stack = []; 
+        stack.push(
+            <View>
+                    <Image
+                        style={[styles.bigImage]}
+                        source={{uri: image}}
+                    />
+            </View>
+        )
+        var found = favarray.find(function(element) {
+            return element === image;
+        });
+        if (found === undefined) {
+            stack.push(
+                <TouchableOpacity style={[styles.heartIconBottom]}>
+                <Icon
+                    name={Platform.OS === "ios" ? "ios-heart-empty" : "md-heart-empty"}
+                    color="#ccc"
+                    size={40}
+                    onPress={() => {
+                        favarray.push(image)
+                        this.setState({
+                            fav: favarray
+                        })
+                    }
+                    }
+
+                />
+            </TouchableOpacity>
+            )
+        }
+        return (<View style={[styles.bigImageView]}>{stack}</View>)
+    }
+
     render() {
 
         if(this.state.mode == "gridview"){
@@ -259,67 +294,15 @@ class ImageApp extends Component {
             );
         }
         else if(this.state.mode == "singleview") {
-            let image = this.state.img
-            console.log(image)
-            var found = favarray.find(function(element) {
-                return element === image;
-            });
-            if (found === undefined) {
                 return (
                     <ScrollView
                         stickyHeaderIndices={[0]}
                         showsVerticalScrollIndicator={false}
                     >
                         {this.Header()}
-                        <View style={[styles.bigImageView]}>
-                            <Image
-                                style={[styles.bigImage]}
-                                source={{uri: image}}
-                            />
-                            <TouchableOpacity style={[styles.heartIconBottom]}>
-                                <Icon
-                                    name={Platform.OS === "ios" ? "ios-heart-empty" : "md-heart-empty"}
-                                    color="#ccc"
-                                    size={40}
-                                    onPress={() => {
-                                        favarray.push(image)
-                                    }
-                                    }
-
-                                />
-                            </TouchableOpacity>
-                        </View>
+                        {this.getSingleImage(this.state.img)}
                     </ScrollView>
                 )
-            }
-            else{
-                return (
-                    <ScrollView
-                        stickyHeaderIndices={[0]}
-                        showsVerticalScrollIndicator={false}
-                    >
-                        {this.Header()}
-                        <View style={[styles.bigImageView]}>
-                            <Image
-                                style={[styles.bigImage]}
-                                source={{uri: image}}
-                            />
-                        </View>
-                    </ScrollView>
-                )
-            }
-        }
-
-        else{
-            return(
-                <ScrollView
-                stickyHeaderIndices={[0]}
-                showsVerticalScrollIndicator={false}
-                >
-                <Text>Something Went Wrong</Text>
-                </ScrollView>
-            )
-
         }
       }
 }
@@ -454,8 +437,8 @@ const styles = StyleSheet.create({
     bigImage:{
        position:'relative',
         resizeMode:'contain',
-        width:win.width,
-        height:win.height,
+        width:win.width- 50 ,
+        height:win.height- 50,
         //
     },
     bigImageView:{
