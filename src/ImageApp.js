@@ -14,6 +14,7 @@ import { SearchBar } from 'react-native-elements';
 import Icon from "react-native-vector-icons/Ionicons";
 import { connect } from 'react-redux'
 const win = Dimensions.get('window');
+let favarray = []
 class ImageApp extends Component {
     constructor(props) {
         super(props);
@@ -176,7 +177,7 @@ class ImageApp extends Component {
     }
     viewImage (image){
         this.state.img = image
-        
+
         this.setState({
             mode : "singleview",
       })
@@ -228,6 +229,7 @@ class ImageApp extends Component {
     }
 
     render() {
+
         if(this.state.mode == "gridview"){
         return (
         <ScrollView
@@ -256,25 +258,58 @@ class ImageApp extends Component {
                 </ScrollView>
             );
         }
-        else if(this.state.mode == "singleview"){
+        else if(this.state.mode == "singleview") {
             let image = this.state.img
             console.log(image)
-            return(
-                <ScrollView
-                stickyHeaderIndices={[0]}
-                showsVerticalScrollIndicator={false}
-                >
-                    {this.Header()}
-                    <View style = {[styles.bigImageView]}>
-                        <Image
-                        style={[styles.bigImage]}
-                        source={{uri: image}}
-                        />
+            var found = favarray.find(function(element) {
+                return element === image;
+            });
+            if (found === undefined) {
+                return (
+                    <ScrollView
+                        stickyHeaderIndices={[0]}
+                        showsVerticalScrollIndicator={false}
+                    >
+                        {this.Header()}
+                        <View style={[styles.bigImageView]}>
+                            <Image
+                                style={[styles.bigImage]}
+                                source={{uri: image}}
+                            />
+                            <TouchableOpacity style={[styles.heartIconBottom]}>
+                                <Icon
+                                    name={Platform.OS === "ios" ? "ios-heart-empty" : "md-heart-empty"}
+                                    color="#ccc"
+                                    size={40}
+                                    onPress={() => {
+                                        favarray.push(image)
+                                    }
+                                    }
 
-                     </View>
-                </ScrollView>
-            )
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </ScrollView>
+                )
+            }
+            else{
+                return (
+                    <ScrollView
+                        stickyHeaderIndices={[0]}
+                        showsVerticalScrollIndicator={false}
+                    >
+                        {this.Header()}
+                        <View style={[styles.bigImageView]}>
+                            <Image
+                                style={[styles.bigImage]}
+                                source={{uri: image}}
+                            />
+                        </View>
+                    </ScrollView>
+                )
+            }
         }
+
         else{
             return(
                 <ScrollView
@@ -284,9 +319,8 @@ class ImageApp extends Component {
                 <Text>Something Went Wrong</Text>
                 </ScrollView>
             )
+
         }
-
-
       }
 }
 
@@ -325,6 +359,10 @@ const styles = StyleSheet.create({
     heartIcon:{
         left: "80%",
         top: "20%",
+        position: 'absolute'
+    },
+    heartIconBottom:{
+        bottom: 0,
         position: 'absolute'
     },
     returnIcon:{
