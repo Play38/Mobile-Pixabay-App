@@ -238,10 +238,7 @@ class ImageApp extends Component {
                     />
             </View>
         )
-        var found = favarray.find(function(element) {
-            return element === image;
-        });
-        if (found === undefined) {
+        if ((favarray.find(element => element === image)) === undefined) {
             stack.push(
                 <TouchableOpacity style={[styles.heartIconBottom]}>
                 <Icon
