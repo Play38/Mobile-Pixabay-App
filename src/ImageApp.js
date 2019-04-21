@@ -233,6 +233,7 @@ class ImageApp extends Component {
         }
         else if(this.state.mode == "singleview"){
             let image = this.state.img
+            console.log(image)
             return(
                 <ScrollView
                 stickyHeaderIndices={[0]}
@@ -244,6 +245,7 @@ class ImageApp extends Component {
                         style={[styles.bigImage]}
                         source={{uri: image}}
                         />
+
                      </View>
                 </ScrollView>
             )
@@ -382,8 +384,11 @@ const styles = StyleSheet.create({
 
     },
     bigImage:{
-        width:'100%',
-        height:'100%'
-    }
+        position:'relative',
+        width:win.width,
+        height:win.height,
+        resizeMode:'center'
+    },
+
 
 });
