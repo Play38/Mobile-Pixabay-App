@@ -240,7 +240,7 @@ class ImageApp extends Component {
                 showsVerticalScrollIndicator={false}
                 >
                     {this.Header()}
-                    <View>
+                    <View style = {[styles.bigImageView]}>
                         <Image
                         style={[styles.bigImage]}
                         source={{uri: image}}
@@ -384,11 +384,19 @@ const styles = StyleSheet.create({
 
     },
     bigImage:{
-        position:'relative',
+       position:'relative',
+        resizeMode:'contain',
         width:win.width,
         height:win.height,
-        resizeMode:'center'
+        //
     },
+    bigImageView:{
+        position:'relative',
+        justifyContent:'center',
+        alignItems: 'center',
+        height:500,
+        width:'100%'
+    }
 
 
 });
