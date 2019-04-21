@@ -8,6 +8,7 @@ import {
     Platform,
     ScrollView,
     Dimensions,
+    Image
 } from "react-native";
 import { SearchBar } from 'react-native-elements';
 import Icon from "react-native-vector-icons/Ionicons";
@@ -16,7 +17,7 @@ const win = Dimensions.get('window');
 class ImageApp extends Component {
     constructor(props) {
         super(props);
-    
+        
         this.viewImage = this.viewImage.bind(this);
       }
     state = {
@@ -78,6 +79,11 @@ class ImageApp extends Component {
                     />
                 </TouchableOpacity>
                 </View>
+            </View>
+        )
+        if(this.state.mode == 'listview' || this.state.mode == 'gridview' ){
+            headerScreen.push(
+                <View>
                 <View style = {[styles.searchStyle]}>
                 <SearchBar
                     placeholder="Type Here..."
@@ -86,11 +92,6 @@ class ImageApp extends Component {
                     lightTheme= {true}
                 />
                 </View>
-            </View>
-        )
-        if(this.state.mode == 'listview' || this.state.mode == 'gridview' ){
-            headerScreen.push(
-                <View>
                     {this.Buttons()}
                 </View>
             )
@@ -150,11 +151,11 @@ class ImageApp extends Component {
     }
     }
     viewImage (image){
-        console.log(`${image}`);
-    //     this.setState({
-    //         mode : "singleview",
-    //         img: image
-    //   })
+        this.state.img = image
+        this.setState({
+            mode : "singleview",
+      })
+      console.log(this.state.img)
       }
     getImages(){
         var view= [];
@@ -187,6 +188,7 @@ class ImageApp extends Component {
                             id = {this.state.dataSource[e].largeImageURL}
                             source = {this.state.dataSource[e].previewURL}
                             style={[styles.imageStyleList]}
+                            onPress= {this.viewImage}
                             />
                             <Text style={[styles.textHeadlineList]}>Headline</Text>
                             <Text
@@ -215,7 +217,7 @@ class ImageApp extends Component {
         </ScrollView>
         );
     }
-        if(this.state.mode == "listview"){
+        else if(this.state.mode == "listview"){
             return (
                 <ScrollView
                     stickyHeaderIndices={[0]}
@@ -229,13 +231,32 @@ class ImageApp extends Component {
                 </ScrollView>
             );
         }
-        if(this.state.mode == "singleview"){
-            <ScrollView
-                    stickyHeaderIndices={[0]}
-                    showsVerticalScrollIndicator={false}
-            >
-            {this.Header()}
-            </ScrollView>
+        else if(this.state.mode == "singleview"){
+            let image = this.state.img
+            return(
+                <ScrollView
+                stickyHeaderIndices={[0]}
+                showsVerticalScrollIndicator={false}
+                >
+                    {this.Header()}
+                    <View>
+                        <Image
+                        style={[styles.bigImage]}
+                        source={{uri: image}}
+                        />
+                     </View>
+                </ScrollView>
+            )
+        }
+        else{
+            return(
+                <ScrollView
+                stickyHeaderIndices={[0]}
+                showsVerticalScrollIndicator={false}
+                >
+                <Text>Something Went Wrong</Text>
+                </ScrollView>
+            )
         }
 
 
@@ -359,6 +380,10 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         top:'50%'
 
+    },
+    bigImage:{
+        width:'100%',
+        height:'100%'
     }
 
 });
