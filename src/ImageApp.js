@@ -15,6 +15,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { connect } from 'react-redux'
 const win = Dimensions.get('window');
 let favarray = []
+let screenStack = []
 class ImageApp extends Component {
     constructor(props) {
         super(props);
@@ -66,7 +67,7 @@ class ImageApp extends Component {
     Header(){
         var headerScreen=[]
         const { search } = this.state;
-        if(this.state.mode == 'singleview')
+        if(this.state.mode == 'singleview' || this.state.mode == 'likeview' )
         {
             headerScreen.push(
                 <View >
@@ -80,8 +81,9 @@ class ImageApp extends Component {
                                 color="#ccc"
                                 size={40}
                                 onPress = {()=>{
+                                     a = screenStack.pop()
                                     this.setState({
-                                        mode : "gridview"
+                                        mode : a
                                     })
                                 }}
                             />
@@ -97,7 +99,15 @@ class ImageApp extends Component {
                         <Text style={[styles.textHeader]}>
                             Image Browser
                         </Text>
-                        <TouchableOpacity style = {[styles.heartIcon]}>
+                        <TouchableOpacity style = {[styles.heartIcon]}
+                        onPress = {()=>{
+                            screenStack.push(this.state.mode)
+                            this.setState({
+                                mode : "likeview",
+                          })
+                        }
+                        }
+                        >
                             <Icon
                                 name={Platform.OS === "ios" ? "ios-heart-empty" : "md-heart-empty"}
                                 color="#ccc"
@@ -177,13 +187,43 @@ class ImageApp extends Component {
     }
     viewImage (image){
         this.state.img = image
-
+        screenStack.push(this.state.mode)
         this.setState({
             mode : "singleview",
       })
       }
     getImages(){
         var view= [];
+        if(this.state.mode == 'likeview'){
+            let data =this.state.fav
+            for (e in data) {
+                    view.push(
+                        <View>
+                            <ImageBtn
+                            id = {data[e]}
+                            source = {data[e]}
+                            style={[styles.imageStyleGrid]}
+                            onPress= {this.viewImage}
+                            />
+                        </View>
+                    )
+            }
+            return view;
+        }
+            for (e in this.state.dataSource) {
+                if (this.state.mode == "gridview") {
+                    view.push(
+                        <View>
+                            <ImageBtn
+                            id = {this.state.dataSource[e].largeImageURL}
+                            source = {this.state.dataSource[e].previewURL}
+                            style={[styles.imageStyleGrid]}
+                            onPress= {this.viewImage}
+                            />
+                        </View>
+                    )
+                }
+        }
         if(this.state.hitnum === 0)
         {
             view.push(
@@ -261,7 +301,6 @@ class ImageApp extends Component {
     }
 
     render() {
-
         if(this.state.mode == "gridview"){
         return (
         <ScrollView
@@ -300,6 +339,20 @@ class ImageApp extends Component {
                         {this.getSingleImage(this.state.img)}
                     </ScrollView>
                 )
+        }
+        else if(this.state.mode == 'likeview'){
+                return(
+                    <ScrollView
+                    stickyHeaderIndices={[0]}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {this.Header()}
+                    <View style = {[styles.imageContainGrid]}>
+                    {this.getImages()}
+                    </View>
+                </ScrollView>
+                )
+
         }
       }
 }
