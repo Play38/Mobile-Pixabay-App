@@ -12,9 +12,397 @@ import {
 } from "react-native";
 import { SearchBar } from 'react-native-elements';
 import Icon from "react-native-vector-icons/Ionicons";
+import AsyncStorage from '@react-native-community/async-storage';
 import { connect } from 'react-redux'
 const win = Dimensions.get('window');
+let favarray = []
+let screenStack = []
+class ImageApp extends Component {
+    constructor(props) {
+        super(props);
+        
+        this.viewImage = this.viewImage.bind(this);
+        this.getSingleImage = this.getSingleImage.bind(this);
+      }
+    state = {
+        search: 'dog',
+        mode: 'gridview',
+      };
+      updateSearch = search => {
+        this.setState({ search: search });
+        var API_KEY = '12215533-b9ee53829290d3d207532d1f9';
+        var URL = "https://pixabay.com/api/?key="+API_KEY+"&q="+encodeURIComponent(search);
+        return fetch(URL)
+          .then((response) => {
+              if(response.status == 200){
+                  response.json().then((responseJson) => {
+                    if(typeof responseJson != "undefined"){
+                        this.setState({
+                        dataSource: responseJson.hits,
+                            hitnum: responseJson.total
+                        });
+                    }
+                  })
+                }
+            })
+
+          .catch((error) =>{
+            console.error(error);
+          });
+    }
+
+      componentDidMount(){
+        this.getAllKeys()
+        var API_KEY = '12215533-b9ee53829290d3d207532d1f9';
+        var URL = "https://pixabay.com/api/?key="+API_KEY+"&q="+encodeURIComponent(this.state.search);
+        return fetch(URL)
+          .then((response) => response.json())
+          .then((responseJson) => {
+            this.setState({
+              dataSource: responseJson.hits
+            });
+          })
+          .catch((error) =>{
+            console.error(error);
+          });
+    }
+    getAllKeys = async () => {
+        try {
+          favarray = await AsyncStorage.getAllKeys()
+        } catch(e) {
+          // read key error
+        }
+        this.setState({
+            fav: favarray
+        })
+        console.log(favarray)
+        // example console.log result:
+        // ['@MyApp_user', '@MyApp_key']
+      }
+    Header(){
+        var headerScreen=[]
+        const { search } = this.state;
+        if(this.state.mode == 'singleview' || this.state.mode == 'likeview' )
+        {
+            headerScreen.push(
+                <View >
+                    <View style={[styles.header]}>
+                        <Text style={[styles.textHeader]}>
+                            Image Browser
+                        </Text>
+                        <TouchableOpacity style = {[styles.returnIcon]}>
+                            <Icon
+                                name={Platform.OS === "ios" ? "ios-return-left" : "md-return-left"}
+                                color="#ccc"
+                                size={40}
+                                onPress = {()=>{
+                                     a = screenStack.pop()
+                                    this.setState({
+                                        mode : a
+                                    })
+                                }}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            )
+        }
+        if(this.state.mode == 'listview' || this.state.mode == 'gridview' ){
+            headerScreen.push(
+                <View >
+                    <View style={[styles.header]}>
+                        <Text style={[styles.textHeader]}>
+                            Image Browser
+                        </Text>
+                        <TouchableOpacity style = {[styles.heartIcon]}
+                        onPress = {()=>{
+                            screenStack.push(this.state.mode)
+                            this.setState({
+                                mode : "likeview",
+                          })
+                        }
+                        }
+                        >
+                            <Icon
+                                name={Platform.OS === "ios" ? "ios-heart-empty" : "md-heart-empty"}
+                                color="#ccc"
+                                size={40}
+                            />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            )
+            headerScreen.push(
+                <View>
+                <View style = {[styles.searchStyle]}>
+                <SearchBar
+                    placeholder="Type Here..."
+                    onChangeText={this.updateSearch}
+                    value={search}
+                    lightTheme= {true}
+                />
+                </View>
+                    {this.Buttons()}
+                </View>
+            )
+        }
+        return(
+            <View>{headerScreen}</View>)
+      }
+
+    Buttons(){
+    if(this.state.mode == "gridview"){
+    return(
+        <View style = {[styles.touchableContainer]}>
+            <TouchableOpacity style = {[styles.viewButtonOn]}
+                onPress = {()=>{
+                    this.setState({
+                        mode : "gridview"
+                    })
+                }}
+            >
+                <Text style = {[styles.textViewButtonOn]}>Grid View</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style = {[styles.viewButtonOff]}
+                            onPress = {()=>{
+                                this.setState({
+                                    mode : "listview"
+                                })
+                            }}
+            >
+                <Text style = {[styles.textViewButtonOff]}>List View</Text>
+            </TouchableOpacity>
+        </View>
+        )
+    }
+    if(this.state.mode == "listview"){
+        return(
+            <View style = {[styles.touchableContainer]}>
+            <TouchableOpacity style = {[styles.viewButtonOff]}
+                onPress = {()=>{
+                    this.setState({
+                        mode : "gridview"
+                    })
+                }}
+            >
+                <Text style = {[styles.textViewButtonOff]}>Grid View</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style = {[styles.viewButtonOn]}
+                    onPress = {()=>{
+                        this.setState({
+                             mode : "listview"
+                       })
+                    }}
+            >
+                <Text style = {[styles.textViewButtonOn]}>List View</Text>
+            </TouchableOpacity>
+        </View>
+            )
+    }
+    }
+    viewImage (image){
+        this.state.img = image
+        screenStack.push(this.state.mode)
+        this.setState({
+            mode : "singleview",
+      })
+      }
+    getImages(){
+        var view= [];
+        if(this.state.mode == 'likeview'){
+            let data =this.state.fav
+            for (e in data) {
+                    view.push(
+                        <View>
+                            <ImageBtn
+                            id = {data[e]}
+                            source = {data[e]}
+                            style={[styles.imageStyleGrid]}
+                            onPress= {this.viewImage}
+                            />
+                        </View>
+                    )
+            }
+            return view;
+        }
+            for (e in this.state.dataSource) {
+                if (this.state.mode == "gridview") {
+                    view.push(
+                        <View>
+                            <ImageBtn
+                            id = {this.state.dataSource[e].largeImageURL}
+                            source = {this.state.dataSource[e].previewURL}
+                            style={[styles.imageStyleGrid]}
+                            onPress= {this.viewImage}
+                            />
+                        </View>
+                    )
+                }
+        }
+        if(this.state.hitnum === 0)
+        {
+            view.push(
+                <View style = {[styles.noResultView]}>
+                    <Text style = {[styles.noResultText]}>No Results{'\n'} Were Found :(</Text>
+                </View>
+            )
+        }
+        else {
+            for (e in this.state.dataSource) {
+                if (this.state.mode == "gridview") {
+                    view.push(
+                        <View>
+                            <ImageBtn
+                            id = {this.state.dataSource[e].largeImageURL}
+                            source = {this.state.dataSource[e].previewURL}
+                            style={[styles.imageStyleGrid]}
+                            onPress= {this.viewImage}
+                            />
+                        </View>
+                    )
+                }
+                if (this.state.mode == "listview") {
+                    view.push(
+                        <View>
+                            <ImageBtn
+                            id = {this.state.dataSource[e].largeImageURL}
+                            source = {this.state.dataSource[e].previewURL}
+                            style={[styles.imageStyleList]}
+                            onPress= {this.viewImage}
+                            />
+                            <Text style={[styles.textHeadlineList]}>Headline</Text>
+                            <Text
+                                style={[styles.textMinorList]}>Likes: {this.state.dataSource[e].likes} Views: {this.state.dataSource[e].views}</Text>
+                        </View>
+                    )
+                }
+            }
+            ;
+        }
+        return view;
+    }
+
+
+    getSingleImage(image){
+        let stack = []; 
+        stack.push(
+            <View>
+                    <Image
+                        style={[styles.bigImage]}
+                        source={{uri: image}}
+                    />
+            </View>
+        )
+        if ((favarray.find(element => element === image)) === undefined) {
+            stack.push(
+                <TouchableOpacity style={[styles.heartIconBottom]}>
+                <Icon
+                    name={Platform.OS === "ios" ? "ios-heart-empty" : "md-heart-empty"}
+                    color="#ccc"
+                    size={40}
+                    onPress={() => {
+                        favarray.push(image)
+                        this.setState({
+                            fav: favarray
+                        })
+                        this.setValue();
+                    }
+                    }
+
+                />
+            </TouchableOpacity>
+            )
+        }
+        return (<View style={[styles.bigImageView]}>{stack}</View>)
+    }
+    setValue = async () => {
+        try {
+          await AsyncStorage.setItem(this.state.img, this.state.img)
+        } catch(e) {
+            console.log(e)
+        }
+      
+        console.log('Done.')
+      }
+    render() {
+        if(this.state.mode == "gridview"){
+        return (
+        <ScrollView
+            stickyHeaderIndices={[0]}
+            showsVerticalScrollIndicator={false}
+        >
+          {this.Header()}
+          <View style = {[styles.imageContainGrid]}>
+          {this.getImages()}
+          </View>
+
+        </ScrollView>
+        );
+    }
+        else if(this.state.mode == "listview"){
+            return (
+                <ScrollView
+                    stickyHeaderIndices={[0]}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {this.Header()}
+                    <View style = {[styles.imageContainList]}>
+                        {this.getImages()}
+                    </View>
+
+                </ScrollView>
+            );
+        }
+        else if(this.state.mode == "singleview") {
+                return (
+                    <ScrollView
+                        stickyHeaderIndices={[0]}
+                        showsVerticalScrollIndicator={false}
+                    >
+                        {this.Header()}
+                        {this.getSingleImage(this.state.img)}
+                    </ScrollView>
+                )
+        }
+        else if(this.state.mode == 'likeview'){
+                return(
+                    <ScrollView
+                    stickyHeaderIndices={[0]}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {this.Header()}
+                    <View style = {[styles.imageContainGrid]}>
+                    {this.getImages()}
+                    </View>
+                </ScrollView>
+                )
+
+        }
+      }
+}
+
+function mapStateToProps(state) {
+    return {
+        mode: this.state.mode
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        viewMode: () => dispatch({ type: 'VIEW_MODE' }),
+        gridMode: () => dispatch({ type: 'GRID_MODE' }),
+    }
+}
+
+export default ImageApp
+
+
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
     header :{
         backgroundColor: '#ff746d',
         height: 75
@@ -121,7 +509,7 @@ const styles = StyleSheet.create({
 
     },
     bigImage:{
-        position:'relative',
+       position:'relative',
         resizeMode:'contain',
         width:win.width- 50 ,
         height:win.height- 50,
@@ -137,307 +525,3 @@ const styles = StyleSheet.create({
 
 
 });
-const favarray = []
-class ImageApp extends Component {
-    constructor(props) {
-        super(props);
-        
-        this.viewImage = this.viewImage.bind(this);
-        this.getSingleImage = this.getSingleImage.bind(this);
-      }
-    state = {
-        search: 'dog',
-        mode: 'gridview',
-      };
-      updateSearch = search => {
-        this.setState({ search });
-        const API_KEY = '12215533-b9ee53829290d3d207532d1f9';
-        const URL = "https://pixabay.com/api/?key="+API_KEY+"&q="+encodeURIComponent(search);
-        return fetch(URL)
-          .then((response) => {
-              if(response.status == 200){
-                  response.json().then((responseJson) => {
-                    if(typeof responseJson !== "undefined"){
-                        this.setState({
-                        dataSource: responseJson.hits,
-                            hitnum: responseJson.total
-                        });
-                    }
-                  })
-                }
-            })
-
-          .catch((error) =>{
-            console.error(error);
-          });
-    }
-
-      componentDidMount(){
-        const API_KEY = '12215533-b9ee53829290d3d207532d1f9';
-        const URL = "https://pixabay.com/api/?key="+API_KEY+"&q="+encodeURIComponent(this.state.search);
-        return fetch(URL)
-          .then((response) => response.json())
-          .then((responseJson) => {
-            this.setState({
-              dataSource: responseJson.hits
-            });
-          })
-          .catch((error) =>{
-            console.error(error);
-          });
-    }
-    Header(){
-        const headerScreen=[]
-        const { search } = this.state;
-        if(this.state.mode == 'singleview')
-        {
-            headerScreen.push(
-                <View >
-                    <View style={[styles.header]}>
-                        <Text style={[styles.textHeader]}>
-                            Image Browser
-                        </Text>
-                        <TouchableOpacity style = {[styles.returnIcon]}>
-                            <Icon
-                                name={Platform.OS === "ios" ? "ios-return-left" : "md-return-left"}
-                                color="#ccc"
-                                size={40}
-                                onPress = {()=>{
-                                    this.setState({
-                                        mode : "gridview"
-                                    })
-                                }}
-                            />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            )
-        }
-        if(this.state.mode == 'listview' || this.state.mode == 'gridview' ){
-            headerScreen.push(
-                <View >
-                    <View style={[styles.header]}>
-                        <Text style={[styles.textHeader]}>
-                            Image Browser
-                        </Text>
-                        <TouchableOpacity style = {[styles.heartIcon]}>
-                            <Icon
-                                name={Platform.OS === "ios" ? "ios-heart-empty" : "md-heart-empty"}
-                                color="#ccc"
-                                size={40}
-                            />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            )
-            headerScreen.push(
-                <View>
-                <View style = {[styles.searchStyle]}>
-                <SearchBar
-                    placeholder="Type Here..."
-                    onChangeText={this.updateSearch}
-                    value={search}
-                    lightTheme
-                />
-                </View>
-                    {this.Buttons()}
-                </View>
-            )
-        }
-        return(
-            <View>{headerScreen}</View>)
-      }
-
-    Buttons(){
-    if(this.state.mode == "gridview"){
-    return(
-        <View style = {[styles.touchableContainer]}>
-            <TouchableOpacity style = {[styles.viewButtonOn]}
-                onPress = {()=>{
-                    this.setState({
-                        mode : "gridview"
-                    })
-                }}
-            >
-                <Text style = {[styles.textViewButtonOn]}>Grid View</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style = {[styles.viewButtonOff]}
-                            onPress = {()=>{
-                                this.setState({
-                                    mode : "listview"
-                                })
-                            }}
-            >
-                <Text style = {[styles.textViewButtonOff]}>List View</Text>
-            </TouchableOpacity>
-        </View>
-        )
-    }
-    if(this.state.mode == "listview"){
-        return(
-            <View style = {[styles.touchableContainer]}>
-            <TouchableOpacity style = {[styles.viewButtonOff]}
-                onPress = {()=>{
-                    this.setState({
-                        mode : "gridview"
-                    })
-                }}
-            >
-                <Text style = {[styles.textViewButtonOff]}>Grid View</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style = {[styles.viewButtonOn]}
-                    onPress = {()=>{
-                        this.setState({
-                             mode : "listview"
-                       })
-                    }}
-            >
-                <Text style = {[styles.textViewButtonOn]}>List View</Text>
-            </TouchableOpacity>
-        </View>
-            )
-    }
-    }
-    viewImage (image){
-        this.state.img = image
-
-        this.setState({
-            mode : "singleview",
-      })
-      }
-    getImages(){
-        const view= [];
-        if(this.state.hitnum === 0)
-        {
-            view.push(
-                <View style = {[styles.noResultView]}>
-                    <Text style = {[styles.noResultText]}>No Results{'\n'} Were Found :(</Text>
-                </View>
-            )
-        }
-        else {
-            for (e in this.state.dataSource) {
-                if (this.state.mode == "gridview") {
-                    view.push(
-                        <View>
-                            <ImageBtn
-                            id = {this.state.dataSource[e].largeImageURL}
-                            source = {this.state.dataSource[e].previewURL}
-                            style={[styles.imageStyleGrid]}
-                            onPress= {this.viewImage}
-                            />
-                        </View>
-                    )
-                }
-                if (this.state.mode == "listview") {
-                    view.push(
-                        <View>
-                            <ImageBtn
-                            id = {this.state.dataSource[e].largeImageURL}
-                            source = {this.state.dataSource[e].previewURL}
-                            style={[styles.imageStyleList]}
-                            onPress= {this.viewImage}
-                            />
-                            <Text style={[styles.textHeadlineList]}>Headline</Text>
-                            <Text
-                                style={[styles.textMinorList]}>Likes: {this.state.dataSource[e].likes} Views: {this.state.dataSource[e].views}</Text>
-                        </View>
-                    )
-                }
-            }
-            ;
-        }
-        return view;
-    }
-
-
-    getSingleImage(image){
-        const stack = [];
-        stack.push(
-            <View>
-                    <Image
-                        style={[styles.bigImage]}
-                        source={{uri: image}}
-                    />
-            </View>
-        )
-        if ((favarray.find(element => element === image)) === undefined) {
-            stack.push(
-                <TouchableOpacity style={[styles.heartIconBottom]}>
-                <Icon
-                    name={Platform.OS === "ios" ? "ios-heart-empty" : "md-heart-empty"}
-                    color="#ccc"
-                    size={40}
-                    onPress={() => {
-                        favarray.push(image)
-                        this.setState({
-                            fav: favarray
-                        })
-                    }
-                    }
-
-                />
-            </TouchableOpacity>
-            )
-        }
-        return (<View style={[styles.bigImageView]}>{stack}</View>)
-    }
-
-    render() {
-
-        if(this.state.mode == "gridview"){
-        return (
-        <ScrollView
-            stickyHeaderIndices={[0]}
-            showsVerticalScrollIndicator={false}
-        >
-          {this.Header()}
-          <View style = {[styles.imageContainGrid]}>
-          {this.getImages()}
-          </View>
-
-        </ScrollView>
-        );
-    }
-        else if(this.state.mode == "listview"){
-            return (
-                <ScrollView
-                    stickyHeaderIndices={[0]}
-                    showsVerticalScrollIndicator={false}
-                >
-                    {this.Header()}
-                    <View style = {[styles.imageContainList]}>
-                        {this.getImages()}
-                    </View>
-
-                </ScrollView>
-            );
-        }
-        else if(this.state.mode == "singleview") {
-                return (
-                    <ScrollView
-                        stickyHeaderIndices={[0]}
-                        showsVerticalScrollIndicator={false}
-                    >
-                        {this.Header()}
-                        {this.getSingleImage(this.state.img)}
-                    </ScrollView>
-                )
-        }
-      }
-}
-
-function mapStateToProps(state) {
-    return {
-        mode: this.state.mode
-    }
-}
-
-function mapDispatchToProps(dispatch) {
-    return {
-        viewMode: () => dispatch({ type: 'VIEW_MODE' }),
-        gridMode: () => dispatch({ type: 'GRID_MODE' }),
-    }
-}
-
-export default ImageApp
