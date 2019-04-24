@@ -20,7 +20,7 @@ let screenStack = []
 class ImageApp extends Component {
     constructor(props) {
         super(props);
-        
+
         this.viewImage = this.viewImage.bind(this);
         this.getSingleImage = this.getSingleImage.bind(this);
       }
@@ -41,6 +41,7 @@ class ImageApp extends Component {
                         dataSource: responseJson.hits,
                             hitnum: responseJson.total
                         });
+
                     }
                   })
                 }
@@ -78,6 +79,7 @@ class ImageApp extends Component {
         console.log(favarray)
         // example console.log result:
         // ['@MyApp_user', '@MyApp_key']
+
       }
     Header(){
         var headerScreen=[]
@@ -96,9 +98,9 @@ class ImageApp extends Component {
                                 color="#ccc"
                                 size={40}
                                 onPress = {()=>{
-                                     a = screenStack.pop()
+                                     returnBut = screenStack.pop()
                                     this.setState({
-                                        mode : a
+                                        mode : returnBut
                                     })
                                 }}
                             />
@@ -201,6 +203,7 @@ class ImageApp extends Component {
     }
     }
     viewImage (image){
+          console.log(image)
         this.state.img = image
         screenStack.push(this.state.mode)
         this.setState({
@@ -209,27 +212,30 @@ class ImageApp extends Component {
       }
     getImages(){
         var view= [];
+
         if(this.state.mode == 'likeview'){
             let data =this.state.fav
             for (e in data) {
+
                     view.push(
                         <View>
                             <ImageBtn
+                                identifier = {data[e]}
                             id = {data[e]}
-                            source = {data[e]}
+                            source = {data[e][0]}
                             style={[styles.imageStyleGrid]}
                             onPress= {this.viewImage}
                             />
                         </View>
                     )
             }
-            return view;
         }
             for (e in this.state.dataSource) {
                 if (this.state.mode == "gridview") {
                     view.push(
                         <View>
                             <ImageBtn
+                                identifier = {this.state.dataSource[e].id}
                             id = {this.state.dataSource[e].largeImageURL}
                             source = {this.state.dataSource[e].previewURL}
                             style={[styles.imageStyleGrid]}
@@ -239,6 +245,7 @@ class ImageApp extends Component {
                     )
                 }
         }
+
         if(this.state.hitnum === 0)
         {
             view.push(
@@ -253,6 +260,7 @@ class ImageApp extends Component {
                     view.push(
                         <View>
                             <ImageBtn
+                                identifier = {this.state.dataSource[e].id}
                             id = {this.state.dataSource[e].largeImageURL}
                             source = {this.state.dataSource[e].previewURL}
                             style={[styles.imageStyleGrid]}
@@ -265,35 +273,35 @@ class ImageApp extends Component {
                     view.push(
                         <View>
                             <ImageBtn
+                                identifier = {this.state.dataSource[e].id}
                             id = {this.state.dataSource[e].largeImageURL}
                             source = {this.state.dataSource[e].previewURL}
                             style={[styles.imageStyleList]}
                             onPress= {this.viewImage}
                             />
-                            <Text style={[styles.textHeadlineList]}>Headline</Text>
+                            <Text style={[styles.textHeadlineList]}>{this.state.dataSource[e].tags}</Text>
                             <Text
                                 style={[styles.textMinorList]}>Likes: {this.state.dataSource[e].likes} Views: {this.state.dataSource[e].views}</Text>
                         </View>
                     )
                 }
-            }
-            ;
+            };
         }
         return view;
     }
 
-
     getSingleImage(image){
-        let stack = []; 
+         console.log(image)
+        let stack = [];
         stack.push(
             <View>
                     <Image
                         style={[styles.bigImage]}
-                        source={{uri: image}}
+                        source={{uri: image[0]}}
                     />
             </View>
         )
-        if ((favarray.find(element => element === image)) === undefined) {
+        if ((favarray.find(element => element[1] === image[1])) === undefined) {
             stack.push(
                 <TouchableOpacity style={[styles.heartIconBottom]}>
                 <Icon
@@ -317,6 +325,7 @@ class ImageApp extends Component {
     }
     setValue = async () => {
         try {
+            console.log(bomb)
           await AsyncStorage.setItem(this.state.img, this.state.img)
         } catch(e) {
             console.log(e)
@@ -325,15 +334,16 @@ class ImageApp extends Component {
         console.log('Done.')
       }
     render() {
+    const allImages = this.getImages()
         if(this.state.mode == "gridview"){
-        return (
+             return (
         <ScrollView
             stickyHeaderIndices={[0]}
             showsVerticalScrollIndicator={false}
         >
           {this.Header()}
           <View style = {[styles.imageContainGrid]}>
-          {this.getImages()}
+              {allImages}
           </View>
 
         </ScrollView>
@@ -347,7 +357,7 @@ class ImageApp extends Component {
                 >
                     {this.Header()}
                     <View style = {[styles.imageContainList]}>
-                        {this.getImages()}
+                        {allImages}
                     </View>
 
                 </ScrollView>
@@ -372,27 +382,16 @@ class ImageApp extends Component {
                 >
                     {this.Header()}
                     <View style = {[styles.imageContainGrid]}>
-                    {this.getImages()}
+                    {allImages}
                     </View>
-                </ScrollView>
+                    </ScrollView>
                 )
 
         }
       }
 }
 
-function mapStateToProps(state) {
-    return {
-        mode: this.state.mode
-    }
-}
 
-function mapDispatchToProps(dispatch) {
-    return {
-        viewMode: () => dispatch({ type: 'VIEW_MODE' }),
-        gridMode: () => dispatch({ type: 'GRID_MODE' }),
-    }
-}
 
 export default ImageApp
 
