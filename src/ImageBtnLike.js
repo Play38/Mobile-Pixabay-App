@@ -16,7 +16,7 @@ export default class ImageBtn extends Component {
        }} >
         <Image
             style={this.props.style}
-            source={{uri: this.props.source[0]}}
+            source={{uri: this.props.source}}
         />
        </TouchableOpacity>
      );

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import ImageBtn from './ImageBtn'
+import ImageBtnLike from './ImageBtnLike'
 import {
     View,
     Text,
@@ -94,7 +95,7 @@ class ImageApp extends Component {
     Header(){
         var headerScreen=[]
         const { search } = this.state;
-        if(this.state.mode == 'singleview' || this.state.mode == 'likeview' )
+        if(this.state.mode == 'singleview' || this.state.mode == 'likeview' || this.state.mode == 'singlelikeview' )
         {
             headerScreen.push(
                 <View >
@@ -214,20 +215,27 @@ class ImageApp extends Component {
     }
     viewImage (image,id){
         this.state.img = image
-        this.state.id = id 
+        this.state.id = id
+
         screenStack.push(this.state.mode)
-        this.setState({
+        if(this.state.mode === 'likeview')
+        {this.setState({
+            mode : "singlelikeview",
+        })}
+
+        else {this.setState({
             mode : "singleview",
-      })
+      })}
       }
     getImages(){
         var view= [];
         if(this.state.mode == 'likeview'){
             let data =favarray
+            console.log(favarray)
             for (e in data) {
                     view.push(
                         <View>
-                            <ImageBtn
+                            <ImageBtnLike
                             id = {data[e].id}
                             source = {data[e].value}
                             style={[styles.imageStyleGrid]}
@@ -244,7 +252,7 @@ class ImageApp extends Component {
                         <View>
                             <ImageBtn
                             id = {this.state.dataSource[e].id}
-                            source = {this.state.dataSource[e].previewURL}
+                            source = {[this.state.dataSource[e].previewURL, this.state.dataSource[e].largeImageURL]}
                             style={[styles.imageStyleGrid]}
                             onPress= {this.viewImage}
                             />
@@ -267,7 +275,7 @@ class ImageApp extends Component {
                         <View>
                             <ImageBtn
                             id = {this.state.dataSource[e].id}
-                            source = {this.state.dataSource[e].previewURL}
+                            source = {[this.state.dataSource[e].previewURL, this.state.dataSource[e].largeImageURL]}
                             style={[styles.imageStyleGrid]}
                             onPress= {this.viewImage}
                             />
@@ -279,11 +287,11 @@ class ImageApp extends Component {
                         <View>
                             <ImageBtn
                             id = {this.state.dataSource[e].id}
-                            source = {this.state.dataSource[e].previewURL}
+                            source = {[this.state.dataSource[e].previewURL, this.state.dataSource[e].largeImageURL]}
                             style={[styles.imageStyleList]}
                             onPress= {this.viewImage}
                             />
-                            <Text style={[styles.textHeadlineList]}>Headline</Text>
+                            <Text style={[styles.textHeadlineList]}>{this.state.dataSource[e].tags}</Text>
                             <Text
                                 style={[styles.textMinorList]}>Likes: {this.state.dataSource[e].likes} Views: {this.state.dataSource[e].views}</Text>
                         </View>
@@ -298,15 +306,27 @@ class ImageApp extends Component {
 
     getSingleImage(image,id){
         var flag = true;
-        let stack = []; 
-        stack.push(
-            <View>
+        let stack = [];
+        console.log(image)
+        if(this.state.mode === 'singlelikeview')
+        {
+            stack.push(
+                <View>
                     <Image
                         style={[styles.bigImage]}
                         source={{uri: image}}
                     />
+                </View>)
+        }
+
+        else {stack.push(
+            <View>
+                    <Image
+                        style={[styles.bigImage]}
+                        source={{uri: image[1]}}
+                    />
             </View>
-        )
+        )}
         for (i in favarray){
             if(favarray[i].id === String(id)){
                 flag=false;
@@ -342,8 +362,8 @@ class ImageApp extends Component {
     }
     setValue = async () => {
         try {
-          await AsyncStorage.setItem(String(this.state.id), this.state.img)
-          favarray.push({ id:String(this.state.id), value: this.state.img})
+          await AsyncStorage.setItem(String(this.state.id), this.state.img[1])
+          favarray.push({ id:String(this.state.id), value: this.state.img[1]})
         } catch(e) {
             console.log(e)
         }
@@ -379,7 +399,7 @@ class ImageApp extends Component {
                 </ScrollView>
             );
         }
-        else if(this.state.mode == "singleview") {
+        else if(this.state.mode == "singleview" || this.state.mode == "singlelikeview" ) {
                 return (
                     <ScrollView
                         stickyHeaderIndices={[0]}
@@ -390,6 +410,7 @@ class ImageApp extends Component {
                     </ScrollView>
                 )
         }
+
         else if(this.state.mode == 'likeview'){
                 return(
                     <ScrollView
