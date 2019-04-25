@@ -347,10 +347,10 @@ class ImageApp extends Component {
     setValue = async () => {
         try {
           await AsyncStorage.setItem(String(this.state.id), this.state.img)
+          favarray.push({ id:String(this.state.id), value: this.state.img})
         } catch(e) {
             console.log(e)
         }
-      
         console.log('Done.')
       }
     render() {
