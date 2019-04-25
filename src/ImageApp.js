@@ -309,7 +309,7 @@ class ImageApp extends Component {
         )
         for (i in favarray){
             if(favarray[i].id === String(id)){
-                flag=false
+                flag=false;
                 break;
             }
         }
@@ -321,10 +321,6 @@ class ImageApp extends Component {
                     color="#ccc"
                     size={40}
                     onPress={() => {
-                        favarray.push({id, image})
-                        this.setState({
-                            fav: favarray
-                        })
                         this.setValue();
                     }
                     }
@@ -351,6 +347,7 @@ class ImageApp extends Component {
         } catch(e) {
             console.log(e)
         }
+        this.forceUpdate();
         console.log('Done.')
       }
     render() {
