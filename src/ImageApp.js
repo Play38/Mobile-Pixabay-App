@@ -16,6 +16,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { connect } from 'react-redux'
 const win = Dimensions.get('window');
 let favarray = []
+let temparr = []
 let screenStack = []
 class ImageApp extends Component {
     constructor(props) {
@@ -52,6 +53,7 @@ class ImageApp extends Component {
     }
 
       componentDidMount(){
+        //this.clearAll()
         this.getAllKeys()
         var API_KEY = '12215533-b9ee53829290d3d207532d1f9';
         var URL = "https://pixabay.com/api/?key="+API_KEY+"&q="+encodeURIComponent(this.state.search);
@@ -67,18 +69,28 @@ class ImageApp extends Component {
           });
     }
     getAllKeys = async () => {
+        temparr =[]
         try {
-          favarray = await AsyncStorage.getAllKeys()
+          temparr = await AsyncStorage.getAllKeys()
         } catch(e) {
           // read key error
         }
-        this.setState({
-            fav: favarray
-        })
-        console.log(favarray)
-        // example console.log result:
-        // ['@MyApp_user', '@MyApp_key']
+        this.getAllValues()
       }
+
+
+    getAllValues= async () => {
+        for (key in temparr){
+        try {
+            const value = await AsyncStorage.getItem(temparr[key])
+            favarray.push({id :temparr[key],value})
+          } catch(e) {
+            // read error
+          }
+        }
+        console.log(favarray)
+
+    }
     Header(){
         var headerScreen=[]
         const { search } = this.state;
@@ -200,8 +212,9 @@ class ImageApp extends Component {
             )
     }
     }
-    viewImage (image){
+    viewImage (image,id){
         this.state.img = image
+        this.state.id = id 
         screenStack.push(this.state.mode)
         this.setState({
             mode : "singleview",
@@ -210,13 +223,13 @@ class ImageApp extends Component {
     getImages(){
         var view= [];
         if(this.state.mode == 'likeview'){
-            let data =this.state.fav
+            let data =favarray
             for (e in data) {
                     view.push(
                         <View>
                             <ImageBtn
-                            id = {data[e]}
-                            source = {data[e]}
+                            id = {data[e].id}
+                            source = {data[e].value}
                             style={[styles.imageStyleGrid]}
                             onPress= {this.viewImage}
                             />
@@ -230,7 +243,7 @@ class ImageApp extends Component {
                     view.push(
                         <View>
                             <ImageBtn
-                            id = {this.state.dataSource[e].largeImageURL}
+                            id = {this.state.dataSource[e].id}
                             source = {this.state.dataSource[e].previewURL}
                             style={[styles.imageStyleGrid]}
                             onPress= {this.viewImage}
@@ -253,7 +266,7 @@ class ImageApp extends Component {
                     view.push(
                         <View>
                             <ImageBtn
-                            id = {this.state.dataSource[e].largeImageURL}
+                            id = {this.state.dataSource[e].id}
                             source = {this.state.dataSource[e].previewURL}
                             style={[styles.imageStyleGrid]}
                             onPress= {this.viewImage}
@@ -265,7 +278,7 @@ class ImageApp extends Component {
                     view.push(
                         <View>
                             <ImageBtn
-                            id = {this.state.dataSource[e].largeImageURL}
+                            id = {this.state.dataSource[e].id}
                             source = {this.state.dataSource[e].previewURL}
                             style={[styles.imageStyleList]}
                             onPress= {this.viewImage}
@@ -283,7 +296,8 @@ class ImageApp extends Component {
     }
 
 
-    getSingleImage(image){
+    getSingleImage(image,id){
+        var flag = true;
         let stack = []; 
         stack.push(
             <View>
@@ -293,7 +307,13 @@ class ImageApp extends Component {
                     />
             </View>
         )
-        if ((favarray.find(element => element === image)) === undefined) {
+        for (i in favarray){
+            if(favarray[i].id === String(id)){
+                flag=false
+                break;
+            }
+        }
+        if (flag) {
             stack.push(
                 <TouchableOpacity style={[styles.heartIconBottom]}>
                 <Icon
@@ -301,7 +321,7 @@ class ImageApp extends Component {
                     color="#ccc"
                     size={40}
                     onPress={() => {
-                        favarray.push(image)
+                        favarray.push({id, image})
                         this.setState({
                             fav: favarray
                         })
@@ -315,9 +335,18 @@ class ImageApp extends Component {
         }
         return (<View style={[styles.bigImageView]}>{stack}</View>)
     }
+    clearAll = async () => {
+        try {
+          await AsyncStorage.clear()
+        } catch(e) {
+          // clear error
+        }
+      
+        console.log('cleared.')
+    }
     setValue = async () => {
         try {
-          await AsyncStorage.setItem(this.state.img, this.state.img)
+          await AsyncStorage.setItem(String(this.state.id), this.state.img)
         } catch(e) {
             console.log(e)
         }
@@ -360,7 +389,7 @@ class ImageApp extends Component {
                         showsVerticalScrollIndicator={false}
                     >
                         {this.Header()}
-                        {this.getSingleImage(this.state.img)}
+                        {this.getSingleImage(this.state.img,this.state.id)}
                     </ScrollView>
                 )
         }
@@ -380,6 +409,7 @@ class ImageApp extends Component {
         }
       }
 }
+
 
 function mapStateToProps(state) {
     return {
