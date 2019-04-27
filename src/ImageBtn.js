@@ -1,24 +1,31 @@
-import React, {Component} from 'react';
-import{TouchableOpacity,Image,Text} from 'react-native';
+import React, { Component } from 'react'
+import { PropTypes } from 'prop-types'
+import { TouchableOpacity, Image} from 'react-native'
 
 export default class ImageBtn extends Component {
-    constructor(props){
-      super(props);
-      this.state={
-          id: this.props.id,
-          style: this.props.style,
-          source: this.props.source,
-        };      
+  static propTypes = {
+    id: PropTypes.number.isRequired,
+    style: PropTypes.any.isRequired,
+    source: PropTypes.node.isRequired,
+    onPress: PropTypes.any.isRequired
+  }
+  constructor(props) {
+    super(props)
+    this.state = {
+      id: this.props.id,
+      style: this.props.style,
+      source: this.props.source
     }
-   render(){
-     return(
-       <TouchableOpacity  onPress={() => {this.props.onPress(this.props.source, this.props.id)
-       }} >
-        <Image
-            style={this.props.style}
-            source={{uri: this.props.source[0]}}
-        />
-       </TouchableOpacity>
-     );
-   }
- }
+  }
+  render() {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          this.props.onPress(this.props.source, this.props.id)
+        }}
+      >
+        <Image style={this.props.style} source={{ uri: this.props.source[0] }} />
+      </TouchableOpacity>
+    )
+  }
+}
