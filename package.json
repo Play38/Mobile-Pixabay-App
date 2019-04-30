@@ -9,8 +9,16 @@
   "checkSubmission": {
     "ex": "2",
     "students": [
-      {"id": "313432213", "fullName": "Omer Guttman", "email": "guttman99@gmail.com"},
-      {"id": "307923615", "fullName": "Ofir Cohen", "email": "ofir_kohn41@hotmail.com"}
+      {
+        "id": "313432213",
+        "fullName": "Omer Guttman",
+        "email": "guttman99@gmail.com"
+      },
+      {
+        "id": "307923615",
+        "fullName": "Ofir Cohen",
+        "email": "ofir_kohn41@hotmail.com"
+      }
     ],
     "os": "Windows",
     "device": "Android",
@@ -21,6 +29,7 @@
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.3.3",
+    "metro-config": "^0.53.1",
     "prop-types": "^15.7.2",
     "react": "16.8.3",
     "react-native": "0.59.5",
