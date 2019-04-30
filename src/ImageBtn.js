@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { PropTypes } from 'prop-types'
-import { TouchableOpacity, Image} from 'react-native'
+import { TouchableOpacity, Image } from 'react-native'
 
 export default class ImageBtn extends Component {
   static propTypes = {

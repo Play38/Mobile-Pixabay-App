@@ -6,8 +6,8 @@ import { View, Text, TouchableOpacity, Platform, ScrollView, Image } from 'react
 import { SearchBar } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/Ionicons'
 import AsyncStorage from '@react-native-community/async-storage'
-const favarray = []
-let temparr = []
+const favArray = []
+let tempArray = []
 const screenStack = []
 class ImageApp extends Component {
   constructor(props) {
@@ -18,7 +18,7 @@ class ImageApp extends Component {
   }
   state = {
     search: 'dog',
-    mode: 'gridview'
+    mode: 'gridView'
   }
   updateSearch = search => {
     this.setState({ search })
@@ -30,7 +30,7 @@ class ImageApp extends Component {
           if (typeof responseJson !== 'undefined') {
             this.setState({
               dataSource: responseJson.hits,
-              hitnum: responseJson.total
+              hitNum: responseJson.total
             })
           }
         })
@@ -53,9 +53,9 @@ class ImageApp extends Component {
       })
   }
   getAllKeys = async () => {
-    temparr = []
+    tempArray = []
     try {
-      temparr = await AsyncStorage.getAllKeys()
+      tempArray = await AsyncStorage.getAllKeys()
     } catch (e) {
       // read key error
     }
@@ -64,10 +64,10 @@ class ImageApp extends Component {
 
   getAllValues = async () => {
     let key
-    for (key in temparr) {
+    for (key in tempArray) {
       try {
-        const value = await AsyncStorage.getItem(temparr[key])
-        favarray.push({ id: temparr[key], value })
+        const value = await AsyncStorage.getItem(tempArray[key])
+        favArray.push({ id: tempArray[key], value })
       } catch (e) {
         // read error
       }
@@ -77,9 +77,9 @@ class ImageApp extends Component {
     const headerScreen = []
     const { search } = this.state
     if (
-      this.state.mode === 'singleview' ||
-      this.state.mode === 'likeview' ||
-      this.state.mode === 'singlelikeview'
+      this.state.mode === 'singleView' ||
+      this.state.mode === 'likeView' ||
+      this.state.mode === 'singleLikeView'
     ) {
       headerScreen.push(
         <View>
@@ -102,7 +102,7 @@ class ImageApp extends Component {
         </View>
       )
     }
-    if (this.state.mode === 'listview' || this.state.mode === 'gridview') {
+    if (this.state.mode === 'listView' || this.state.mode === 'gridView') {
       headerScreen.push(
         <View>
           <View style={[styles.header]}>
@@ -112,7 +112,7 @@ class ImageApp extends Component {
               onPress={() => {
                 screenStack.push(this.state.mode)
                 this.setState({
-                  mode: 'likeview'
+                  mode: 'likeView'
                 })
               }}
             >
@@ -143,14 +143,14 @@ class ImageApp extends Component {
   }
 
   Buttons() {
-    if (this.state.mode === 'gridview') {
+    if (this.state.mode === 'gridView') {
       return (
         <View style={[styles.touchableContainer]}>
           <TouchableOpacity
             style={[styles.viewButtonOn]}
             onPress={() => {
               this.setState({
-                mode: 'gridview'
+                mode: 'gridView'
               })
             }}
           >
@@ -160,7 +160,7 @@ class ImageApp extends Component {
             style={[styles.viewButtonOff]}
             onPress={() => {
               this.setState({
-                mode: 'listview'
+                mode: 'listView'
               })
             }}
           >
@@ -169,14 +169,14 @@ class ImageApp extends Component {
         </View>
       )
     }
-    if (this.state.mode === 'listview') {
+    if (this.state.mode === 'listView') {
       return (
         <View style={[styles.touchableContainer]}>
           <TouchableOpacity
             style={[styles.viewButtonOff]}
             onPress={() => {
               this.setState({
-                mode: 'gridview'
+                mode: 'gridView'
               })
             }}
           >
@@ -186,7 +186,7 @@ class ImageApp extends Component {
             style={[styles.viewButtonOn]}
             onPress={() => {
               this.setState({
-                mode: 'listview'
+                mode: 'listView'
               })
             }}
           >
@@ -203,21 +203,21 @@ class ImageApp extends Component {
     })
 
     screenStack.push(this.state.mode)
-    if (this.state.mode === 'likeview') {
+    if (this.state.mode === 'likeView') {
       this.setState({
-        mode: 'singlelikeview'
+        mode: 'singleLikeView'
       })
     } else {
       this.setState({
-        mode: 'singleview'
+        mode: 'singleView'
       })
     }
   }
   getImages() {
     let e
     const view = []
-    if (this.state.mode === 'likeview') {
-      const data = favarray
+    if (this.state.mode === 'likeView') {
+      const data = favArray
       for (e in data) {
         view.push(
           <View>
@@ -233,7 +233,7 @@ class ImageApp extends Component {
       return view
     }
     for (e in this.state.dataSource) {
-      if (this.state.mode === 'gridview') {
+      if (this.state.mode === 'gridView') {
         view.push(
           <View>
             <ImageBtn
@@ -246,7 +246,7 @@ class ImageApp extends Component {
         )
       }
     }
-    if (this.state.hitnum === 0) {
+    if (this.state.hitNum === 0) {
       view.push(
         <View style={[styles.noResultView]}>
           <Text style={[styles.noResultText]}>No Results{'\n'} Were Found :(</Text>
@@ -254,7 +254,7 @@ class ImageApp extends Component {
       )
     } else {
       for (e in this.state.dataSource) {
-        if (this.state.mode === 'gridview') {
+        if (this.state.mode === 'gridView') {
           view.push(
             <View>
               <ImageBtn
@@ -269,7 +269,7 @@ class ImageApp extends Component {
             </View>
           )
         }
-        if (this.state.mode === 'listview') {
+        if (this.state.mode === 'listView') {
           view.push(
             <View>
               <ImageBtn
@@ -297,7 +297,7 @@ class ImageApp extends Component {
     let i
     let flag = true
     const stack = []
-    if (this.state.mode === 'singlelikeview') {
+    if (this.state.mode === 'singleLikeView') {
       stack.push(
         <View>
           <Image style={[styles.bigImage]} source={{ uri: image }} />
@@ -310,8 +310,8 @@ class ImageApp extends Component {
         </View>
       )
     }
-    for (i in favarray) {
-      if (favarray[i].id === String(id)) {
+    for (i in favArray) {
+      if (favArray[i].id === String(id)) {
         flag = false
         break
       }
@@ -342,35 +342,35 @@ class ImageApp extends Component {
   setValue = async () => {
     try {
       await AsyncStorage.setItem(String(this.state.id), this.state.img[1])
-      favarray.push({ id: String(this.state.id), value: this.state.img[1] })
+      favArray.push({ id: String(this.state.id), value: this.state.img[1] })
     } catch (e) {
       //read error
     }
     this.forceUpdate()
   }
   render() {
-    if (this.state.mode === 'gridview') {
+    if (this.state.mode === 'gridView') {
       return (
         <ScrollView stickyHeaderIndices={[0]} showsVerticalScrollIndicator={false}>
           {this.Header()}
           <View style={[styles.imageContainGrid]}>{this.getImages()}</View>
         </ScrollView>
       )
-    } else if (this.state.mode === 'listview') {
+    } else if (this.state.mode === 'listView') {
       return (
         <ScrollView stickyHeaderIndices={[0]} showsVerticalScrollIndicator={false}>
           {this.Header()}
           <View style={[styles.imageContainList]}>{this.getImages()}</View>
         </ScrollView>
       )
-    } else if (this.state.mode === 'singleview' || this.state.mode === 'singlelikeview') {
+    } else if (this.state.mode === 'singleView' || this.state.mode === 'singleLikeView') {
       return (
         <ScrollView stickyHeaderIndices={[0]} showsVerticalScrollIndicator={false}>
           {this.Header()}
           {this.getSingleImage(this.state.img, this.state.id)}
         </ScrollView>
       )
-    } else if (this.state.mode === 'likeview') {
+    } else if (this.state.mode === 'likeView') {
       return (
         <ScrollView stickyHeaderIndices={[0]} showsVerticalScrollIndicator={false}>
           {this.Header()}
