@@ -4,7 +4,7 @@ import { TouchableOpacity, Image } from 'react-native'
 
 export default class ImageBtn extends Component {
   static propTypes = {
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     style: PropTypes.any.isRequired,
     source: PropTypes.node.isRequired,
     onPress: PropTypes.any.isRequired
@@ -24,7 +24,7 @@ export default class ImageBtn extends Component {
           this.props.onPress(this.props.source, this.props.id)
         }}
       >
-        <Image style={this.props.style} source={{ uri: this.props.source[0] }} />
+        <Image style={this.props.style} source={{ uri: this.props.source }} />
       </TouchableOpacity>
     )
   }
